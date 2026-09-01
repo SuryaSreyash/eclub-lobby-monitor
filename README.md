@@ -2,12 +2,19 @@
 
 ## SETUP STEPS
 
-### 1. Add your Apps Script URL
+### 1. Connect the Apps Script to the correct Google account and sheet
+- Open the Apps Script project in Google Apps Script editor.
+- In `appscript/Code.gs`, update `SPREADSHEET_ID` with the spreadsheet ID from the sheet you want to use.
+- The spreadsheet ID is the long string in the sheet URL: `https://docs.google.com/spreadsheets/d/PASTE_ID_HERE/edit`
+- If you do not want to use the ID, you can also change `SPREADSHEET_NAME`, but using the ID is safer because it points to one exact file.
+- Make sure the Apps Script project itself is opened from the Google account that owns the sheet.
+
+### 2. Add your Apps Script URL
 - Find the file called .env.example
 - Make a copy and rename it to .env
 - Replace the URL inside with your Apps Script Web App URL
 
-### 2. Run locally to test
+### 3. Run locally to test
 Open terminal in VSCode and run:
   npm install
   npm start

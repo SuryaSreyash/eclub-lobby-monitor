@@ -51,7 +51,39 @@ function calcTripTime(entry, allLogs) {
   };
 }
 
-export default function ActivityLog({ logs }) {
+export default function ActivityLog({ logs, students = [] }) {
+  // Helper to extract student ID from a log entry (handles all header variations)
+  function getStudentId(entry) {
+    return entry.studentId || entry.id || entry.ID || entry['Student ID'] || entry['studentId'] || entry.student_id || '';
+  }
+
+  // Helper to extract student Name from a log entry, with fallback to students array lookup
+  function getStudentName(entry) {
+    const directName = entry.studentName || entry.name || entry.Name || entry['Student Name'] || entry['studentName'] || entry.student || entry.Student || entry.student_name || '';
+    if (directName && directName.trim() !== '' && directName !== 'Unknown Student') {
+      return directName.trim();
+    }
+    // Fallback: look up by 10-digit ID in the students list
+    const id = getStudentId(entry);
+    if (id && students.length > 0) {
+      const match = students.find(s => s.id === id);
+      if (match && match.name) return match.name;
+    }
+    return directName || (id ? 'Student (' + id + ')' : 'Unknown Student');
+  }
+
+  // Helper to extract team
+  function getTeam(entry) {
+    const directTeam = entry.team || entry.Team || entry['Team'] || '';
+    if (directTeam) return directTeam;
+    const id = getStudentId(entry);
+    if (id && students.length > 0) {
+      const match = students.find(s => s.id === id);
+      if (match && match.team) return match.team;
+    }
+    return '';
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 
@@ -86,6 +118,9 @@ export default function ActivityLog({ logs }) {
         ) : (
           logs.map((entry, i) => {
             const trip = calcTripTime(entry, logs);
+            const studentName = getStudentName(entry);
+            const studentId = getStudentId(entry);
+            const team = getTeam(entry);
 
             return (
               <div key={i} style={{
@@ -106,33 +141,49 @@ export default function ActivityLog({ logs }) {
                   fontFamily: 'JetBrains Mono,monospace',
                   fontSize: 12, color: 'var(--text3)',
                   letterSpacing: 1, lineHeight: 1.5,
-                }}>{fmtTime(entry.timestamp)}</div>
+                }}>{fmtTime(entry.timestamp || entry.Timestamp || entry.ts)}</div>
 
                 {/* Arrow */}
                 <div style={{
                   fontSize: 18, fontWeight: 800, textAlign: 'center',
-                  color: entry.action === 'out' ? 'var(--red)' : 'var(--green)',
+                  color: (entry.action === 'out' || (entry.actionType && entry.actionType.indexOf('out') !== -1)) ? 'var(--red)' : 'var(--green)',
                 }}>
-                  {entry.action === 'out' ? '↑' : '↓'}
+                  {(entry.action === 'out' || (entry.actionType && entry.actionType.indexOf('out') !== -1)) ? '↑' : '↓'}
                 </div>
 
                 {/* Info */}
-                <div>
-                  {/* Student name — big and clear */}
+                <div style={{ minWidth: 0 }}>
+                  {/* Student name + Team badge */}
                   <div style={{
-                    fontSize: 16, fontWeight: 700,
-                    color: 'var(--text)', marginBottom: 3,
+                    display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
+                    marginBottom: 4,
                   }}>
-                    {entry.studentName}
+                    <span style={{
+                      fontSize: 15, fontWeight: 700,
+                      color: 'var(--text)',
+                    }}>
+                      {studentName}
+                    </span>
+                    {team && (
+                      <span style={{
+                        display: 'inline-block', fontSize: 10, fontWeight: 700,
+                        letterSpacing: 1, padding: '2px 8px', borderRadius: 10,
+                        background: 'var(--amber-dim)',
+                        color: 'var(--amber2)',
+                        border: '1px solid rgba(245,158,11,0.25)',
+                        fontFamily: 'JetBrains Mono, monospace',
+                        textTransform: 'uppercase', flexShrink: 0,
+                      }}>{team}</span>
+                    )}
                   </div>
 
-                  {/* ID · Team */}
+                  {/* ID */}
                   <div style={{
                     fontFamily: 'JetBrains Mono,monospace',
-                    fontSize: 12, color: 'var(--text3)', letterSpacing: 1,
+                    fontSize: 11, color: 'var(--text3)', letterSpacing: 1,
                     marginBottom: trip ? 5 : 0,
                   }}>
-                    {entry.studentId} · {entry.team}
+                    {studentId}
                   </div>
 
                   {/* Trip time — only shows on IN entries */}

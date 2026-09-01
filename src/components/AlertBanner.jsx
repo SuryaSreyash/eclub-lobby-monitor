@@ -25,7 +25,7 @@ function elapsed(exitTime) {
   return Math.floor(m / 60) + 'h ' + (m % 60) + 'm';
 }
 
-export default function AlertBanner({ students }) {
+export default function AlertBanner({ students, teamsOnBreak = new Set() }) {
   const [, setTick] = useState(0);
   const [dismissed, setDismissed] = useState([]);
   const [visible, setVisible] = useState(true);
@@ -39,6 +39,7 @@ export default function AlertBanner({ students }) {
 
   const overdue = students.filter(s => {
     if (s.status !== 'outside') return false;
+    if (teamsOnBreak.has(s.team)) return false;
     return getMinutesOut(s.exitTime) >= 15;
   });
 

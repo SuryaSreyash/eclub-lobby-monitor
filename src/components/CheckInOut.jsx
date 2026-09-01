@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
-import { updateStudent, addLog } from '../utils/api';
+import { updateStudent, addLog, addSpecialPermission } from '../utils/api';
+import MajorityWarningModal from './MajorityWarningModal';
 
-export default function CheckInOut({ students, onRefresh, onOptimistic }) {
+export default function CheckInOut({ students, onRefresh, onOptimistic, authorizers = [], teamsOnBreak = new Set(), onSpecialPermission }) {
   const [inputId, setInputId] = useState('');
   const [loading, setLoading] = useState(false);
   const [msg,     setMsg]     = useState(null);
+
+  // Majority-out modal state
+  const [majorityWarning, setMajorityWarning] = useState(null);
+  // { student, teamName, insideCount, totalCount, halfRequired }
 
   const found = inputId.length === 10
     ? students.find(s => s.id === inputId)
@@ -15,9 +20,9 @@ export default function CheckInOut({ students, onRefresh, onOptimistic }) {
     setTimeout(() => setMsg(null), 4500);
   }
 
-  async function doAction(action) {
-    if (!found) return;
-    const s = found;
+  async function doAction(action, overrideStudent = null) {
+    const s = overrideStudent || found;
+    if (!s) return;
 
     if (action === 'out' && s.status === 'outside') {
       showMsg(s.name + ' is already outside.', 'warn'); return;
@@ -26,16 +31,27 @@ export default function CheckInOut({ students, onRefresh, onOptimistic }) {
       showMsg(s.name + ' is already inside.', 'warn'); return;
     }
 
-    if (action === 'out') {
+    if (action === 'out' && !teamsOnBreak.has(s.team)) {
       const teamMembers = students.filter(x => x.team === s.team);
       const insideCount = teamMembers.filter(x => x.status === 'inside').length;
       const half = Math.ceil(teamMembers.length / 2);
       if (insideCount - 1 < half) {
-        showMsg('Not Permitted — Team "' + s.team + '" needs at least ' + half + ' members inside. Currently ' + insideCount + ' inside.', 'error');
+        // Show warning modal instead of hard deny
+        setMajorityWarning({
+          student: s,
+          teamName: s.team,
+          insideCount,
+          totalCount: teamMembers.length,
+          halfRequired: half,
+        });
         return;
       }
     }
 
+    executeCheckout(s, action);
+  }
+
+  function executeCheckout(s, action) {
     if (onOptimistic) onOptimistic(s.id, action, s);
     setInputId('');
     showMsg(action === 'out' ? '✓ ' + s.name + ' checked OUT' : '✓ ' + s.name + ' checked IN', 'success');
@@ -55,6 +71,22 @@ export default function CheckInOut({ students, onRefresh, onOptimistic }) {
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleMajorityPermit(authorizerName) {
+    if (!majorityWarning) return;
+    const s = majorityWarning.student;
+
+    // Record the special permission
+    addSpecialPermission({ team: s.team, authorizer: authorizerName });
+    if (onSpecialPermission) onSpecialPermission({ team: s.team, authorizer: authorizerName });
+
+    setMajorityWarning(null);
+    executeCheckout(s, 'out');
+  }
+
+  function handleMajorityDeny() {
+    setMajorityWarning(null);
   }
 
   const colors = {
@@ -157,6 +189,20 @@ export default function CheckInOut({ students, onRefresh, onOptimistic }) {
           border: '1px solid ' + colors[msg.type]?.border,
           color: colors[msg.type]?.color,
         }}>{msg.text}</div>
+      )}
+
+      {/* Majority-Out Warning Modal */}
+      {majorityWarning && (
+        <MajorityWarningModal
+          student={majorityWarning.student}
+          teamName={majorityWarning.teamName}
+          insideCount={majorityWarning.insideCount}
+          totalCount={majorityWarning.totalCount}
+          halfRequired={majorityWarning.halfRequired}
+          authorizers={authorizers}
+          onPermit={handleMajorityPermit}
+          onDeny={handleMajorityDeny}
+        />
       )}
 
     </div>
