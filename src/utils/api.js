@@ -3,11 +3,11 @@ const USE_MOCK = process.env.REACT_APP_MOCK_API === 'true';
 
 // Local memory store for mock mode
 let mockStudents = [
-  { id: '2024017306', name: 'Anushka Prajapati', team: 'T4', status: 'inside', exitTime: '', entryTime: '' },
-  { id: '2024005600', name: 'Laxmi Vajra', team: 'T4', status: 'inside', exitTime: '', entryTime: '' },
-  { id: '2024007430', name: 'Usha Rani', team: 'T4', status: 'inside', exitTime: '', entryTime: '' },
-  { id: '2024142402', name: 'Sreeshanth Talari', team: 'Knowledge tribe', status: 'inside', exitTime: '', entryTime: '' },
-  { id: '2024013649', name: 'Karthik Garlapally', team: 'Knowledge tribe', status: 'inside', exitTime: '', entryTime: '' }
+  { id: '2024017306', name: 'Anushka Prajapati', team: 'T4', status: 'inside', exitTime: '', entryTime: '', type: 's' },
+  { id: '2024005600', name: 'Laxmi Vajra', team: 'T4', status: 'inside', exitTime: '', entryTime: '', type: 'h' },
+  { id: '2024007430', name: 'Usha Rani', team: 'T4', status: 'inside', exitTime: '', entryTime: '', type: 's' },
+  { id: '2024142402', name: 'Sreeshanth Talari', team: 'Knowledge tribe', status: 'inside', exitTime: '', entryTime: '', type: 's' },
+  { id: '2024013649', name: 'Karthik Garlapally', team: 'Knowledge tribe', status: 'inside', exitTime: '', entryTime: '', type: 'h' }
 ];
 let mockLogs = [];
 let mockSpecialPermissions = [];
@@ -16,6 +16,7 @@ const mockAuthorizers = ['Alice', 'Bob', 'Charlie'];
 function buildUrl(params) {
   const url = new URL(BASE);
   Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, v));
+  url.searchParams.append('_t', Date.now());
   return url.toString();
 }
 

@@ -84,6 +84,16 @@ export default function ActivityLog({ logs, students = [] }) {
     return '';
   }
 
+  // Helper to extract type
+  function getType(entry) {
+    const id = getStudentId(entry);
+    if (id && students.length > 0) {
+      const match = students.find(s => s.id === id);
+      if (match && match.type) return match.type;
+    }
+    return '';
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 
@@ -121,6 +131,7 @@ export default function ActivityLog({ logs, students = [] }) {
             const studentName = getStudentName(entry);
             const studentId = getStudentId(entry);
             const team = getTeam(entry);
+            const type = getType(entry);
 
             return (
               <div key={i} style={{
@@ -173,7 +184,7 @@ export default function ActivityLog({ logs, students = [] }) {
                         border: '1px solid rgba(245,158,11,0.25)',
                         fontFamily: 'JetBrains Mono, monospace',
                         textTransform: 'uppercase', flexShrink: 0,
-                      }}>{team}</span>
+                      }}>{team} {type ? `(${type.trim().toUpperCase()[0]})` : ''}</span>
                     )}
                   </div>
 

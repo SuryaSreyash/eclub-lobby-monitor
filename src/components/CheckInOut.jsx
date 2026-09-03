@@ -139,7 +139,7 @@ export default function CheckInOut({ students, onRefresh, onOptimistic, authoriz
           {found ? (
             <>
               <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text)', marginBottom: 5 }}>{found.name}</div>
-              <div style={{ fontFamily: 'JetBrains Mono,monospace', fontSize: 13, color: 'var(--text2)', letterSpacing: 1, marginBottom: 8 }}>{found.id} · Team {found.team}</div>
+              <div style={{ fontFamily: 'JetBrains Mono,monospace', fontSize: 13, color: 'var(--text2)', letterSpacing: 1, marginBottom: 8 }}>{found.id} · Team {found.team} {found.type ? `(${found.type.trim().toUpperCase()[0]})` : ''}</div>
               <span style={{
                 display: 'inline-block', fontSize: 10, fontWeight: 700, letterSpacing: 2,
                 padding: '3px 10px', borderRadius: 20,
