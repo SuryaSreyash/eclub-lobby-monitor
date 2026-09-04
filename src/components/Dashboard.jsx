@@ -182,38 +182,27 @@ export default function Dashboard({ students }) {
                     fontSize: 10, color: 'var(--text3)',
                     letterSpacing: 1, marginBottom: 6,
                   }}>{s.id}</div>
-<<<<<<< HEAD
-                  <div style={{
-                    display: 'inline-block', fontSize: 10, fontWeight: 600,
-                    color: 'var(--amber2)', background: 'var(--amber-dim)',
-                    border: '1px solid rgba(245,158,11,0.25)',
-                    padding: '2px 8px', borderRadius: 10, marginBottom: 7,
-                  }}>
-                    {s.team} {s.type ? `(${s.type.trim().toUpperCase()[0]})` : ''}
-                  </div>
-=======
-                  
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 7 }}>
                     <div style={{
                       display: 'inline-block', fontSize: 10, fontWeight: 600,
                       color: 'var(--amber2)', background: 'var(--amber-dim)',
                       border: '1px solid rgba(245,158,11,0.25)',
                       padding: '2px 8px', borderRadius: 10,
-                    }}>{s.team}</div>
+                    }}>
+                      {s.team} {s.type && !cat ? `(${s.type.trim().toUpperCase()})` : ''}
+                    </div>
 
                     {cat && (
                       <div style={{
                         display: 'inline-block', fontSize: 9, fontWeight: 700,
-                        color: cat.toLowerCase().includes('software') ? '#60a5fa' : cat.toLowerCase().includes('hardware') ? '#a7f3d0' : 'var(--text2)',
-                        background: cat.toLowerCase().includes('software') ? 'rgba(59,130,246,0.15)' : cat.toLowerCase().includes('hardware') ? 'rgba(16,185,129,0.15)' : 'var(--bg2)',
-                        border: '1px solid ' + (cat.toLowerCase().includes('software') ? 'rgba(59,130,246,0.3)' : cat.toLowerCase().includes('hardware') ? 'rgba(16,185,129,0.3)' : 'var(--border)'),
+                        color: cat.toLowerCase().includes('software') || cat.toLowerCase() === 's' ? '#60a5fa' : cat.toLowerCase().includes('hardware') || cat.toLowerCase() === 'h' ? '#a7f3d0' : 'var(--text2)',
+                        background: cat.toLowerCase().includes('software') || cat.toLowerCase() === 's' ? 'rgba(59,130,246,0.15)' : cat.toLowerCase().includes('hardware') || cat.toLowerCase() === 'h' ? 'rgba(16,185,129,0.15)' : 'var(--bg2)',
+                        border: '1px solid ' + (cat.toLowerCase().includes('software') || cat.toLowerCase() === 's' ? 'rgba(59,130,246,0.3)' : cat.toLowerCase().includes('hardware') || cat.toLowerCase() === 'h' ? 'rgba(16,185,129,0.3)' : 'var(--border)'),
                         padding: '2px 7px', borderRadius: 10,
                         fontFamily: 'JetBrains Mono,monospace', textTransform: 'uppercase',
                       }}>{cat}</div>
                     )}
                   </div>
-
->>>>>>> e7a192f (Add Software/Hardware filter for Currently Outside column, update Google Sheet category schema, and fix refresh async handling)
                   <div style={{
                     fontFamily: 'JetBrains Mono,monospace',
                     fontSize: 12, fontWeight: 600,
