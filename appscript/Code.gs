@@ -45,7 +45,7 @@ function setupSheets() {
     return sheet;
   }
 
-  ensureSheet(STUDENTS_SHEET,           ['id', 'name', 'team', 'status', 'exitTime', 'entryTime', 'type']);
+  ensureSheet(STUDENTS_SHEET,           ['id', 'name', 'team', 'status', 'exitTime', 'entryTime', 'category']);
   ensureSheet(LOGS_SHEET,               ['studentId', 'studentName', 'team', 'action', 'timestamp']);
   ensureSheet(AUTHORIZERS_SHEET,        ['name']);
   ensureSheet(SPECIAL_PERMISSIONS_SHEET,['team', 'authorizer', 'timestamp']);
@@ -104,12 +104,14 @@ function updateStudent(params) {
   var statusCol = headers.indexOf('status');
   var exitCol   = headers.indexOf('exitTime');
   var entryCol  = headers.indexOf('entryTime');
+  var catCol    = headers.indexOf('category');
   if (idCol === -1) return response({ error: 'id column not found' });
   for (var i = 1; i < data.length; i++) {
     if (data[i][idCol].toString().trim() === id) {
-      if (statusCol !== -1) sheet.getRange(i+1, statusCol+1).setValue(params.status || '');
-      if (exitCol   !== -1) sheet.getRange(i+1, exitCol+1).setValue(params.exitTime || '');
-      if (entryCol  !== -1) sheet.getRange(i+1, entryCol+1).setValue(params.entryTime || '');
+      if (statusCol !== -1 && params.status    !== undefined) sheet.getRange(i+1, statusCol+1).setValue(params.status || '');
+      if (exitCol   !== -1 && params.exitTime  !== undefined) sheet.getRange(i+1, exitCol+1).setValue(params.exitTime || '');
+      if (entryCol  !== -1 && params.entryTime !== undefined) sheet.getRange(i+1, entryCol+1).setValue(params.entryTime || '');
+      if (catCol    !== -1 && params.category  !== undefined) sheet.getRange(i+1, catCol+1).setValue(params.category || '');
       return response({ success: true });
     }
   }

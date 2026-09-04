@@ -6,6 +6,7 @@ import SendTeamOnBreak from '../components/SendTeamOnBreak';
 import SpecialPermissions from '../components/SpecialPermissions';
 import TimerAlerts from '../components/TimerAlerts';
 import ActivityLog from '../components/ActivityLog';
+import Dashboard from '../components/Dashboard';
 
 // Mock the API calls
 jest.mock('../utils/api', () => ({
@@ -270,5 +271,45 @@ describe('ActivityLog Component UI Improvements', () => {
     // Fallback: Name should resolve from students list for Bob Jones since directName was 'Unknown Student'
     expect(screen.getByText('Bob Jones')).toBeInTheDocument();
     expect(screen.getByText('B')).toBeInTheDocument(); // Team Badge
+  });
+});
+
+describe('Dashboard Component - Software/Hardware Filter', () => {
+  const mockStudents = [
+    { id: '101', name: 'Software Dev 1', team: 'Team Web', category: 'Software', status: 'outside', exitTime: Date.now().toString() },
+    { id: '102', name: 'Hardware Eng 1', team: 'Team Embedded', category: 'Hardware', status: 'outside', exitTime: Date.now().toString() },
+    { id: '103', name: 'Software Dev 2', team: 'Team App', category: 'Software', status: 'outside', exitTime: Date.now().toString() },
+    { id: '104', name: 'Inside Member', team: 'Team AI', category: 'Software', status: 'inside', exitTime: '' },
+  ];
+
+  test('renders filter options and defaults to ALL', () => {
+    render(<Dashboard students={mockStudents} />);
+    expect(screen.getByRole('button', { name: 'ALL' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'SOFTWARE' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'HARDWARE' })).toBeInTheDocument();
+    
+    // Default ALL shows all outside members
+    expect(screen.getByText('Software Dev 1')).toBeInTheDocument();
+    expect(screen.getByText('Hardware Eng 1')).toBeInTheDocument();
+    expect(screen.getByText('Software Dev 2')).toBeInTheDocument();
+    expect(screen.queryByText('Inside Member')).toBeNull();
+  });
+
+  test('filters by SOFTWARE when SOFTWARE button is clicked', () => {
+    render(<Dashboard students={mockStudents} />);
+    fireEvent.click(screen.getByRole('button', { name: 'SOFTWARE' }));
+
+    expect(screen.getByText('Software Dev 1')).toBeInTheDocument();
+    expect(screen.getByText('Software Dev 2')).toBeInTheDocument();
+    expect(screen.queryByText('Hardware Eng 1')).toBeNull();
+  });
+
+  test('filters by HARDWARE when HARDWARE button is clicked', () => {
+    render(<Dashboard students={mockStudents} />);
+    fireEvent.click(screen.getByRole('button', { name: 'HARDWARE' }));
+
+    expect(screen.getByText('Hardware Eng 1')).toBeInTheDocument();
+    expect(screen.queryByText('Software Dev 1')).toBeNull();
+    expect(screen.queryByText('Software Dev 2')).toBeNull();
   });
 });

@@ -28,22 +28,27 @@ function isOverdue(exitTime) {
 }
 
 export default function Dashboard({ students }) {
+  const [filter, setFilter] = useState('ALL');
   const [, setTick] = useState(0);
-  const [filterType, setFilterType] = useState('all');
 
   useEffect(() => {
-    const t = setInterval(() => setTick(n => n + 1), 1000);
+    const t = setInterval(() => setTick(n => n + 1), 10000);
     return () => clearInterval(t);
   }, []);
 
-  const outside = students.filter(s => {
-    if (s.status !== 'outside') return false;
-    const type = (s.type || '').toLowerCase();
-    if (filterType === 'software') return type === 's' || type === 'software';
-    if (filterType === 'hardware') return type === 'h' || type === 'hardware';
-    return true;
+  const outside = students.filter(s => s.status === 'outside');
+  const inside = students.length - outside.length;
+
+  const filteredOutside = outside.filter(s => {
+    if (filter === 'ALL') return true;
+    const cat = (s.category || s.type || s.domain || '').toLowerCase();
+    if (cat) {
+      if (filter === 'SOFTWARE') return cat === 's' || cat.includes('software');
+      if (filter === 'HARDWARE') return cat === 'h' || cat.includes('hardware');
+      return cat.includes(filter.toLowerCase());
+    }
+    return (s.team || '').toLowerCase().includes(filter.toLowerCase());
   });
-  const inside = students.filter(s => s.status !== 'outside').length;
 
   return (
     <div>
@@ -82,7 +87,7 @@ export default function Dashboard({ students }) {
       <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)' }}>
         <div style={{
           display: 'flex', alignItems: 'center',
-          justifyContent: 'space-between', marginBottom: 12,
+          justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 12,
         }}>
           <div style={{
             fontFamily: 'JetBrains Mono,monospace',
@@ -90,44 +95,70 @@ export default function Dashboard({ students }) {
             letterSpacing: 3, color: 'var(--text3)',
             textTransform: 'uppercase',
           }}>Currently Outside</div>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <select 
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              style={{
-                background: 'var(--bg3)', border: '1px solid var(--border)',
-                color: 'var(--text2)', padding: '4px 8px', borderRadius: 6,
-                fontFamily: 'JetBrains Mono,monospace', fontSize: 10,
-                outline: 'none', cursor: 'pointer'
-              }}
-            >
-              <option value="all">ALL</option>
-              <option value="software">SOFTWARE (S)</option>
-              <option value="hardware">HARDWARE (H)</option>
-            </select>
-            <div style={{
-              fontFamily: 'JetBrains Mono,monospace',
-              fontSize: 11, color: 'var(--text3)',
-            }}>{outside.length} student{outside.length !== 1 ? 's' : ''}</div>
+
+          {/* Software / Hardware Filter */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 4,
+            background: 'var(--bg3)', padding: 3, borderRadius: 6,
+            border: '1px solid var(--border)',
+          }}>
+            {['ALL', 'SOFTWARE', 'HARDWARE'].map(opt => {
+              const active = filter === opt;
+              return (
+                <button
+                  key={opt}
+                  onClick={() => setFilter(opt)}
+                  style={{
+                    background: active ? 'var(--amber-dim)' : 'transparent',
+                    color: active ? 'var(--amber2)' : 'var(--text3)',
+                    border: active ? '1px solid rgba(245,158,11,0.3)' : '1px solid transparent',
+                    borderRadius: 4,
+                    padding: '3px 9px',
+                    fontFamily: 'JetBrains Mono,monospace',
+                    fontSize: 10,
+                    fontWeight: active ? 700 : 500,
+                    cursor: 'pointer',
+                    letterSpacing: 1,
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {opt}
+                </button>
+              );
+            })}
+          </div>
+
+          <div style={{
+            fontFamily: 'JetBrains Mono,monospace',
+            fontSize: 11, color: 'var(--text3)',
+          }}>
+            {filter === 'ALL' ? (
+              `${outside.length} student${outside.length !== 1 ? 's' : ''}`
+            ) : (
+              `${filteredOutside.length} of ${outside.length} (${filter})`
+            )}
           </div>
         </div>
 
-        {!outside.length ? (
+        {!filteredOutside.length ? (
           <div style={{
             textAlign: 'center', padding: '24px',
             color: 'var(--text3)',
             fontFamily: 'JetBrains Mono,monospace',
             fontSize: 11, letterSpacing: 2,
-          }}>ALL STUDENTS INSIDE</div>
+          }}>
+            {!outside.length ? 'ALL STUDENTS INSIDE' : `NO ${filter} STUDENTS OUTSIDE`}
+          </div>
         ) : (
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill,minmax(175px,1fr))',
             gap: 8,
           }}>
-            {outside.map(s => {
+            {filteredOutside.map(s => {
               const overdue = isOverdue(s.exitTime);
+              const cat = s.category || s.type || s.domain;
+
               return (
                 <div key={s.id} style={{
                   background: overdue ? 'rgba(245,158,11,0.07)' : 'var(--bg3)',
@@ -151,6 +182,7 @@ export default function Dashboard({ students }) {
                     fontSize: 10, color: 'var(--text3)',
                     letterSpacing: 1, marginBottom: 6,
                   }}>{s.id}</div>
+<<<<<<< HEAD
                   <div style={{
                     display: 'inline-block', fontSize: 10, fontWeight: 600,
                     color: 'var(--amber2)', background: 'var(--amber-dim)',
@@ -159,6 +191,29 @@ export default function Dashboard({ students }) {
                   }}>
                     {s.team} {s.type ? `(${s.type.trim().toUpperCase()[0]})` : ''}
                   </div>
+=======
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 7 }}>
+                    <div style={{
+                      display: 'inline-block', fontSize: 10, fontWeight: 600,
+                      color: 'var(--amber2)', background: 'var(--amber-dim)',
+                      border: '1px solid rgba(245,158,11,0.25)',
+                      padding: '2px 8px', borderRadius: 10,
+                    }}>{s.team}</div>
+
+                    {cat && (
+                      <div style={{
+                        display: 'inline-block', fontSize: 9, fontWeight: 700,
+                        color: cat.toLowerCase().includes('software') ? '#60a5fa' : cat.toLowerCase().includes('hardware') ? '#a7f3d0' : 'var(--text2)',
+                        background: cat.toLowerCase().includes('software') ? 'rgba(59,130,246,0.15)' : cat.toLowerCase().includes('hardware') ? 'rgba(16,185,129,0.15)' : 'var(--bg2)',
+                        border: '1px solid ' + (cat.toLowerCase().includes('software') ? 'rgba(59,130,246,0.3)' : cat.toLowerCase().includes('hardware') ? 'rgba(16,185,129,0.3)' : 'var(--border)'),
+                        padding: '2px 7px', borderRadius: 10,
+                        fontFamily: 'JetBrains Mono,monospace', textTransform: 'uppercase',
+                      }}>{cat}</div>
+                    )}
+                  </div>
+
+>>>>>>> e7a192f (Add Software/Hardware filter for Currently Outside column, update Google Sheet category schema, and fix refresh async handling)
                   <div style={{
                     fontFamily: 'JetBrains Mono,monospace',
                     fontSize: 12, fontWeight: 600,

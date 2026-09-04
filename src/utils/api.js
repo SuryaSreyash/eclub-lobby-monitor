@@ -30,12 +30,14 @@ export async function fetchStudents() {
   return data;
 }
 
-export async function updateStudent({ id, status, exitTime = '', entryTime = '' }) {
+export async function updateStudent({ id, status, exitTime = '', entryTime = '', category = '' }) {
   if (USE_MOCK) {
-    mockStudents = mockStudents.map(s => s.id === id ? { ...s, status, exitTime, entryTime } : s);
+    mockStudents = mockStudents.map(s => s.id === id ? { ...s, status, exitTime, entryTime, ...(category ? { category } : {}) } : s);
     return { success: true };
   }
-  const res = await fetch(buildUrl({ action: 'updateStudent', id, status, exitTime, entryTime }));
+  const params = { action: 'updateStudent', id, status, exitTime, entryTime };
+  if (category) params.category = category;
+  const res = await fetch(buildUrl(params));
   const data = await res.json();
   if (data.error) throw new Error(data.error);
   return data;

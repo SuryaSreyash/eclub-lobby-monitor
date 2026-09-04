@@ -51,7 +51,7 @@ export default function CheckInOut({ students, onRefresh, onOptimistic, authoriz
     executeCheckout(s, action);
   }
 
-  function executeCheckout(s, action) {
+  async function executeCheckout(s, action) {
     if (onOptimistic) onOptimistic(s.id, action, s);
     setInputId('');
     showMsg(action === 'out' ? '✓ ' + s.name + ' checked OUT' : '✓ ' + s.name + ' checked IN', 'success');
@@ -62,10 +62,10 @@ export default function CheckInOut({ students, onRefresh, onOptimistic, authoriz
       const entryTime = action === 'in'  ? Date.now().toString() : (s.entryTime || '');
       const status    = action === 'out' ? 'outside' : 'inside';
 
-      updateStudent({ id: s.id, status, exitTime, entryTime });
-      addLog({ studentId: s.id, studentName: s.name, team: s.team, actionType: action });
+      await updateStudent({ id: s.id, status, exitTime, entryTime });
+      await addLog({ studentId: s.id, studentName: s.name, team: s.team, actionType: action });
 
-      setTimeout(() => onRefresh(), 3000);
+      if (onRefresh) onRefresh();
     } catch (err) {
       showMsg('Error saving. Check your connection.', 'error');
     } finally {

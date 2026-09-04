@@ -30,7 +30,7 @@ OR connect GitHub to Netlify for auto-deploy.
 ## GOOGLE SHEETS HEADERS
 
 students tab row 1:
-  id | name | team | status | exitTime | entryTime
+  id | name | team | status | exitTime | entryTime | category
 
 logs tab row 1:
   studentId | studentName | team | action | timestamp
