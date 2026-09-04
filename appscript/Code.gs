@@ -1,6 +1,6 @@
 // Set this to the exact spreadsheet ID from the Google account you want to use.
 // You can find it in the sheet URL: https://docs.google.com/spreadsheets/d/PASTE_ID_HERE/edit
-var SPREADSHEET_ID = 'PASTE_SHEET_ID_HERE';
+var SPREADSHEET_ID = '1YEmRYXCivwZW8maH5jd8AJfp_U5-ESqh7Wrpin31kzo';
 var SPREADSHEET_NAME = 'SIH2026'; // fallback only if SPREADSHEET_ID is blank
 var STUDENTS_SHEET = 'students';
 var LOGS_SHEET = 'logs';
@@ -45,7 +45,7 @@ function setupSheets() {
     return sheet;
   }
 
-  ensureSheet(STUDENTS_SHEET,           ['id', 'name', 'team', 'status', 'exitTime', 'entryTime']);
+  ensureSheet(STUDENTS_SHEET,           ['id', 'name', 'team', 'status', 'exitTime', 'entryTime', 'type']);
   ensureSheet(LOGS_SHEET,               ['studentId', 'studentName', 'team', 'action', 'timestamp']);
   ensureSheet(AUTHORIZERS_SHEET,        ['name']);
   ensureSheet(SPECIAL_PERMISSIONS_SHEET,['team', 'authorizer', 'timestamp']);

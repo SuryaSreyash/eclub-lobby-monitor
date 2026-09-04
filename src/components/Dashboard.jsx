@@ -29,14 +29,21 @@ function isOverdue(exitTime) {
 
 export default function Dashboard({ students }) {
   const [, setTick] = useState(0);
+  const [filterType, setFilterType] = useState('all');
 
   useEffect(() => {
-    const t = setInterval(() => setTick(n => n + 1), 10000);
+    const t = setInterval(() => setTick(n => n + 1), 1000);
     return () => clearInterval(t);
   }, []);
 
-  const outside = students.filter(s => s.status === 'outside');
-  const inside = students.length - outside.length;
+  const outside = students.filter(s => {
+    if (s.status !== 'outside') return false;
+    const type = (s.type || '').toLowerCase();
+    if (filterType === 'software') return type === 's' || type === 'software';
+    if (filterType === 'hardware') return type === 'h' || type === 'hardware';
+    return true;
+  });
+  const inside = students.filter(s => s.status !== 'outside').length;
 
   return (
     <div>
@@ -83,10 +90,27 @@ export default function Dashboard({ students }) {
             letterSpacing: 3, color: 'var(--text3)',
             textTransform: 'uppercase',
           }}>Currently Outside</div>
-          <div style={{
-            fontFamily: 'JetBrains Mono,monospace',
-            fontSize: 11, color: 'var(--text3)',
-          }}>{outside.length} student{outside.length !== 1 ? 's' : ''}</div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <select 
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              style={{
+                background: 'var(--bg3)', border: '1px solid var(--border)',
+                color: 'var(--text2)', padding: '4px 8px', borderRadius: 6,
+                fontFamily: 'JetBrains Mono,monospace', fontSize: 10,
+                outline: 'none', cursor: 'pointer'
+              }}
+            >
+              <option value="all">ALL</option>
+              <option value="software">SOFTWARE (S)</option>
+              <option value="hardware">HARDWARE (H)</option>
+            </select>
+            <div style={{
+              fontFamily: 'JetBrains Mono,monospace',
+              fontSize: 11, color: 'var(--text3)',
+            }}>{outside.length} student{outside.length !== 1 ? 's' : ''}</div>
+          </div>
         </div>
 
         {!outside.length ? (
@@ -132,7 +156,9 @@ export default function Dashboard({ students }) {
                     color: 'var(--amber2)', background: 'var(--amber-dim)',
                     border: '1px solid rgba(245,158,11,0.25)',
                     padding: '2px 8px', borderRadius: 10, marginBottom: 7,
-                  }}>{s.team}</div>
+                  }}>
+                    {s.team} {s.type ? `(${s.type.trim().toUpperCase()[0]})` : ''}
+                  </div>
                   <div style={{
                     fontFamily: 'JetBrains Mono,monospace',
                     fontSize: 12, fontWeight: 600,

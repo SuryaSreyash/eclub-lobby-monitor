@@ -66,7 +66,7 @@ export default function MajorityWarningModal({
           fontSize: 14, color: 'var(--text2)', lineHeight: 1.6,
           marginBottom: 16, paddingLeft: 2,
         }}>
-          Checking out <strong style={{ color: 'var(--text)' }}>{student?.name}</strong> would
+          Checking out <strong style={{ color: 'var(--text)' }}>{student?.name} {student?.type ? `(${student.type.trim().toUpperCase()[0]})` : ''}</strong> would
           put more than half of <strong style={{ color: 'var(--amber)' }}>Team {teamName}</strong> outside.
         </div>
 

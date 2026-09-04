@@ -29,7 +29,7 @@ export default function TimerAlerts({ students, teamsOnBreak = new Set() }) {
   const [, setTick] = useState(0);
 
   useEffect(() => {
-    const t = setInterval(() => setTick(n => n + 1), 10000);
+    const t = setInterval(() => setTick(n => n + 1), 1000);
     return () => clearInterval(t);
   }, []);
 
@@ -99,7 +99,7 @@ export default function TimerAlerts({ students, teamsOnBreak = new Set() }) {
                 fontFamily: 'JetBrains Mono, monospace',
                 fontSize: 10, color: 'var(--text3)', letterSpacing: 1,
                 marginBottom: 6,
-              }}>{s.id} · {s.team}</div>
+              }}>{s.id} · {s.team} {s.type ? `(${s.type.trim().toUpperCase()[0]})` : ''}</div>
 
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5,

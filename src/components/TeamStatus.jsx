@@ -22,9 +22,9 @@ export default function TeamStatus({ students, specialPermissions = [] }) {
   const [expandedTeam, setExpandedTeam] = useState(null);
   const [, setTick] = useState(0);
 
-  // Re-render every 10s for live timers in the dropdown
+  // Re-render every 1s for live timers in the dropdown
   useEffect(() => {
-    const t = setInterval(() => setTick(n => n + 1), 10000);
+    const t = setInterval(() => setTick(n => n + 1), 1000);
     return () => clearInterval(t);
   }, []);
 
@@ -195,7 +195,7 @@ export default function TeamStatus({ students, specialPermissions = [] }) {
                           <div style={{
                             fontSize: 12, fontWeight: 600, color: 'var(--text)',
                             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                          }}>{s.name}</div>
+                          }}>{s.name} {s.type ? `(${s.type.trim().toUpperCase()[0]})` : ''}</div>
                           <div style={{
                             fontFamily: 'JetBrains Mono, monospace',
                             fontSize: 9, color: 'var(--text3)', letterSpacing: 1,
